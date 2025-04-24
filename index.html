@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Table Monitor</title>
+  <style>
+    body { font-family: sans-serif; background: #f8f8f8; padding: 20px; }
+    table { border-collapse: collapse; width: 100%; background: white; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    th { background: #eee; }
+  </style>
+</head>
+<body>
+  <h1>สถานะโต๊ะ</h1>
+  <table id="statusTable">
+    <thead>
+      <tr>
+        <th>เวลา</th>
+        <th>โต๊ะ</th>
+        <th>เก้าอี้1</th>
+        <th>เก้าอี้2</th>
+        <th>เก้าอี้3</th>
+        <th>เก้าอี้4</th>
+        <th>สถานะ</th>
+        <th>ชื่อ</th>
+        <th>รหัสนักศึกษา</th>
+        <th>อีเมล</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    const sheetID = "1Ei6gGj1QQhqJu_7iq-n1CBo83VTA0-pXgB7w3x0_OOM"; // แทนที่ด้วยของจริง
+    const sheetName = "TableStatus";
+    const apiKey = "AIzaSyA3gRJTfFdPsObTg8j-7piZc4UYzuCjcJo"; // ใช้ Google API Console เพื่อสร้าง API Key
+
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${sheetName}?key=${apiKey}`;
+
+    fetch(url)
+      .then(res => res.json())
+      .then(data => {
+        const rows = data.values;
+        const tbody = document.querySelector("#statusTable tbody");
+        for (let i = 1; i < rows.length; i++) {
+          const tr = document.createElement("tr");
+          rows[i].forEach(cell => {
+            const td = document.createElement("td");
+            td.textContent = cell;
+            tr.appendChild(td);
+          });
+          tbody.appendChild(tr);
+        }
+      });
+  </script>
+</body>
+</html>
