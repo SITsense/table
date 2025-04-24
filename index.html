@@ -8,6 +8,7 @@
     table { border-collapse: collapse; width: 100%; background: white; }
     th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
     th { background: #eee; }
+    .error { color: red; margin-top: 20px; }
   </style>
 </head>
 <body>
@@ -27,30 +28,41 @@
         <th>อีเมล</th>
       </tr>
     </thead>
-    <tbody></tbody>
+    <tbody>
+      <tr><td colspan="10">กำลังโหลดข้อมูล...</td></tr>
+    </tbody>
   </table>
+  <div class="error" id="errorMsg"></div>
 
   <script>
     const sheetID = "1Ei6gGj1QQhqJu_7iq-n1CBo83VTA0-pXgB7w3x0_OOM"; // แทนที่ด้วยของจริง
-    const sheetName = "TableStatus";
+    const sheetName = "Data";
     const apiKey = "AIzaSyA3gRJTfFdPsObTg8j-7piZc4UYzuCjcJo"; // ใช้ Google API Console เพื่อสร้าง API Key
 
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${sheetName}?key=${apiKey}`;
 
     fetch(url)
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error("ไม่สามารถโหลดข้อมูลได้");
+        return res.json();
+      })
       .then(data => {
         const rows = data.values;
         const tbody = document.querySelector("#statusTable tbody");
+        tbody.innerHTML = ""; // ล้างข้อความ "กำลังโหลด..."
+
         for (let i = 1; i < rows.length; i++) {
           const tr = document.createElement("tr");
-          rows[i].forEach(cell => {
+          for (let j = 0; j < 10; j++) {
             const td = document.createElement("td");
-            td.textContent = cell;
+            td.textContent = rows[i][j] || "-"; // ถ้าไม่มีค่า ให้แสดง "-"
             tr.appendChild(td);
-          });
+          }
           tbody.appendChild(tr);
         }
+      })
+      .catch(error => {
+        document.getElementById("errorMsg").textContent = error.message;
       });
   </script>
 </body>
