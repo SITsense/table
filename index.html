@@ -1,41 +1,25 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>Login โต๊ะเรียน</title>
-</head>
-<body>
-  <h2>ล็อกอินเพื่อใช้งานโต๊ะ</h2>
-  <form id="loginForm">
-    <label>ชื่อ: <input type="text" id="name" required></label><br>
-    <label>รหัสนักศึกษา: <input type="text" id="studentID" required></label><br>
-    <label>อีเมล: <input type="email" id="email" required></label><br>
-    <button type="submit">ล็อกอิน</button>
-  </form>
+<form id="booking-form">
+  <input type="text" id="name" placeholder="Name" required>
+  <input type="text" id="studentID" placeholder="Student ID" required>
+  <input type="email" id="email" placeholder="Email" required>
+  <button type="submit">Submit</button>
+</form>
 
-  <script>
-    const form = document.getElementById("loginForm");
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
+<script>
+  document.getElementById("booking-form").addEventListener("submit", function(e) {
+    e.preventDefault();
+    const data = {
+      name: document.getElementById("name").value,
+      studentID: document.getElementById("studentID").value,
+      email: document.getElementById("email").value,
+      from: "WebForm"
+    };
 
-      const url = "https://script.google.com/macros/s/your-script-id/exec"; // แทนที่ด้วย Script URL จริง
-      const params = new URLSearchParams({
-        name: document.getElementById("name").value,
-        studentID: document.getElementById("studentID").value,
-        email: document.getElementById("email").value,
-        table: "1", // สมมุติว่าเป็นโต๊ะ 1
-        loginTime: new Date().toLocaleString("th-TH")
-      });
-
-      fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: params
-      })
-      .then(res => res.text())
-      .then(text => alert("ส่งข้อมูลสำเร็จ"))
-      .catch(err => alert("เกิดข้อผิดพลาด: " + err));
-    });
-  </script>
-</body>
-</html>
+    fetch("https://script.google.com/macros/s/AKfycbz3BAoUZr7_uy2BFocspCqgMlf9lfM_fcUea4J6LWBlinNBR6KjIk2HKNI5sblC6T0/exec", {
+      method: "POST",
+      body: JSON.stringify(data)
+    })
+    .then(res => res.text())
+    .then(txt => alert("Submitted: " + txt));
+  });
+</script>
