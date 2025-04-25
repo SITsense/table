@@ -2,68 +2,40 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Table Monitor</title>
-  <style>
-    body { font-family: sans-serif; background: #f8f8f8; padding: 20px; }
-    table { border-collapse: collapse; width: 100%; background: white; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
-    th { background: #eee; }
-    .error { color: red; margin-top: 20px; }
-  </style>
+  <title>Login โต๊ะเรียน</title>
 </head>
 <body>
-  <h1>สถานะโต๊ะ</h1>
-  <table id="statusTable">
-    <thead>
-      <tr>
-        <th>เวลา</th>
-        <th>โต๊ะ</th>
-        <th>เก้าอี้1</th>
-        <th>เก้าอี้2</th>
-        <th>เก้าอี้3</th>
-        <th>เก้าอี้4</th>
-        <th>สถานะ</th>
-        <th>ชื่อ</th>
-        <th>รหัสนักศึกษา</th>
-        <th>อีเมล</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr><td colspan="10">กำลังโหลดข้อมูล...</td></tr>
-    </tbody>
-  </table>
-  <div class="error" id="errorMsg"></div>
+  <h2>ล็อกอินเพื่อใช้งานโต๊ะ</h2>
+  <form id="loginForm">
+    <label>ชื่อ: <input type="text" id="name" required></label><br>
+    <label>รหัสนักศึกษา: <input type="text" id="studentID" required></label><br>
+    <label>อีเมล: <input type="email" id="email" required></label><br>
+    <button type="submit">ล็อกอิน</button>
+  </form>
 
   <script>
-    const sheetID = "1Ei6gGj1QQhqJu_7iq-n1CBo83VTA0-pXgB7w3x0_OOM"; // แทนที่ด้วยของจริง
-    const sheetName = "Data";
-    const apiKey = "AIzaSyA3gRJTfFdPsObTg8j-7piZc4UYzuCjcJo"; // ใช้ Google API Console เพื่อสร้าง API Key
+    const form = document.getElementById("loginForm");
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
 
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${sheetName}?key=${apiKey}`;
-
-    fetch(url)
-      .then(res => {
-        if (!res.ok) throw new Error("ไม่สามารถโหลดข้อมูลได้");
-        return res.json();
-      })
-      .then(data => {
-        const rows = data.values;
-        const tbody = document.querySelector("#statusTable tbody");
-        tbody.innerHTML = ""; // ล้างข้อความ "กำลังโหลด..."
-
-        for (let i = 1; i < rows.length; i++) {
-          const tr = document.createElement("tr");
-          for (let j = 0; j < 10; j++) {
-            const td = document.createElement("td");
-            td.textContent = rows[i][j] || "-"; // ถ้าไม่มีค่า ให้แสดง "-"
-            tr.appendChild(td);
-          }
-          tbody.appendChild(tr);
-        }
-      })
-      .catch(error => {
-        document.getElementById("errorMsg").textContent = error.message;
+      const url = "https://script.google.com/macros/s/your-script-id/exec"; // แทนที่ด้วย Script URL จริง
+      const params = new URLSearchParams({
+        name: document.getElementById("name").value,
+        studentID: document.getElementById("studentID").value,
+        email: document.getElementById("email").value,
+        table: "1", // สมมุติว่าเป็นโต๊ะ 1
+        loginTime: new Date().toLocaleString("th-TH")
       });
+
+      fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: params
+      })
+      .then(res => res.text())
+      .then(text => alert("ส่งข้อมูลสำเร็จ"))
+      .catch(err => alert("เกิดข้อผิดพลาด: " + err));
+    });
   </script>
 </body>
 </html>
