@@ -5,25 +5,95 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SITsense Table Booking</title>
   <style>
-    /* [STYLE เดิมที่ส่งมา ใช้ได้เลย] */
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; background: #eef6f9; color: #333; }
-    h1 { font-size: 32px; margin-bottom: 30px; text-align: center; color: #1e3a5f; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 20px;
+      background: #eef6f9;
+      color: #333;
+    }
+    h1 {
+      font-size: 32px;
+      margin-bottom: 30px;
+      text-align: center;
+      color: #1e3a5f;
+    }
     .hidden { display: none; }
-    .table-card, .form-card { background: white; padding: 24px; margin-bottom: 20px; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); max-width: 500px; margin-left: auto; margin-right: auto; }
-    .status { display: inline-block; padding: 6px 12px; border-radius: 12px; font-size: 14px; font-weight: bold; color: white; background-color: #4caf50; margin-bottom: 10px; }
-    button { margin-top: 12px; padding: 14px; width: 100%; font-size: 16px; border: none; border-radius: 12px; font-weight: bold; background: #007acc; color: white; cursor: pointer; transition: background 0.3s, transform 0.2s; }
-    button:hover { background: #005fa3; transform: translateY(-2px); }
-    h2 { margin-bottom: 20px; font-size: 24px; text-align: center; color: #1e3a5f; }
-    input { width: 100%; padding: 16px; margin-bottom: 16px; border-radius: 14px; border: 1px solid #ccc; font-size: 16px; background: #f8f9fa; transition: border-color 0.3s, box-shadow 0.3s; }
-    input:focus { border-color: #007acc; box-shadow: 0 0 8px rgba(0, 122, 204, 0.4); background: #ffffff; outline: none; }
-    .table-name { font-size: 20px; margin-bottom: 12px; color: #444; }
-    .info-line { margin: 6px 0; }
+    .table-card, .form-card {
+      background: white;
+      padding: 24px;
+      margin-bottom: 20px;
+      border-radius: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .status {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: bold;
+      color: white;
+      background-color: #4caf50;
+      margin-bottom: 10px;
+    }
+    button {
+      margin-top: 12px;
+      padding: 14px;
+      width: 100%;
+      font-size: 16px;
+      border: none;
+      border-radius: 12px;
+      font-weight: bold;
+      background: #007acc;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+    }
+    button:hover {
+      background: #005fa3;
+      transform: translateY(-2px);
+    }
+    h2 {
+      margin-bottom: 20px;
+      font-size: 24px;
+      text-align: center;
+      color: #1e3a5f;
+    }
+    input {
+      width: 100%;
+      padding: 16px;
+      margin-bottom: 16px;
+      border-radius: 14px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+      box-sizing: border-box;
+      background: #f8f9fa;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    input:focus {
+      border-color: #007acc;
+      box-shadow: 0 0 8px rgba(0, 122, 204, 0.4);
+      background: #ffffff;
+      outline: none;
+    }
+    .table-name {
+      font-size: 20px;
+      margin-bottom: 12px;
+      color: #444;
+    }
+    .info-line {
+      margin: 6px 0;
+    }
   </style>
 </head>
+
 <body>
 
 <h1>SITsense</h1>
 
+<!-- หน้าแสดงโต๊ะ -->
 <div id="mainPage">
   <div class="table-card" id="table1">
     <div class="table-name">Table 1</div>
@@ -42,6 +112,7 @@
   </div>
 </div>
 
+<!-- หน้า Login -->
 <div id="loginPage" class="hidden">
   <div class="form-card">
     <h2>Login Table <span id="loginTableNumber"></span></h2>
@@ -53,6 +124,7 @@
   </div>
 </div>
 
+<!-- หน้า Logout -->
 <div id="logoutPage" class="hidden">
   <div class="form-card">
     <h2>Logout Table <span id="logoutTableNumber"></span></h2>
@@ -64,7 +136,7 @@
 
 <script>
 let selectedTable = null;
-const scriptURL = 'https://script.google.com/macros/s/AKfycbz3BAoUZr7_uy2BFocspCqgMlf9lfM_fcUea4J6LWBlinNBR6KjIk2HKNI5sblC6T0/exec'; // เปลี่ยนเป็นของคุณ
+const scriptURL = 'https://script.google.com/macros/s/AKfycbz3BAoUZr7_uy2BFocspCqgMlf9lfM_fcUea4J6LWBlinNBR6KjIk2HKNI5sblC6T0/exec'; // เปลี่ยนตามของคุณ
 
 function goToLogin(table) {
   selectedTable = table;
@@ -84,18 +156,14 @@ function showMainPage() {
   document.getElementById('mainPage').classList.remove('hidden');
   document.getElementById('loginPage').classList.add('hidden');
   document.getElementById('logoutPage').classList.add('hidden');
-  clearForm();
-  updateUI();
-}
-
-function clearForm() {
   document.getElementById('nameInput').value = '';
   document.getElementById('studentIDInput').value = '';
   document.getElementById('emailInput').value = '';
   document.getElementById('logoutStudentIDInput').value = '';
+  updateUI();
 }
 
-async function confirmLogin() {
+function confirmLogin() {
   const name = document.getElementById('nameInput').value.trim();
   const studentID = document.getElementById('studentIDInput').value.trim();
   const email = document.getElementById('emailInput').value.trim();
@@ -109,74 +177,99 @@ async function confirmLogin() {
     return;
   }
 
-  const data = new URLSearchParams();
-  data.append('status', 'จองแล้ว');
-  data.append('name', name);
-  data.append('studentID', studentID);
-  data.append('email', email);
-  data.append('table', selectedTable);
+  const user = { name, studentID, email };
 
-  await fetch(scriptURL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: data
-  });
+  if (selectedTable === 1) {
+    const data = new URLSearchParams();
+    data.append('status', 'จองแล้ว');
+    data.append('name', name);
+    data.append('studentID', studentID);
+    data.append('email', email);
 
-  showMainPage();
+    fetch(scriptURL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: data
+    }).then(response => response.text())
+      .then(result => {
+        localStorage.setItem('table1User', JSON.stringify(user));
+        showMainPage();
+      }).catch(error => {
+        alert('เกิดข้อผิดพลาด: ' + error);
+      });
+  } else if (selectedTable === 2) {
+    localStorage.setItem('table2User', JSON.stringify(user));
+    showMainPage();
+  }
 }
 
-async function confirmLogout() {
+function confirmLogout() {
   const inputID = document.getElementById('logoutStudentIDInput').value.trim();
-  if (!inputID) {
-    alert('กรุณากรอกรหัสนักศึกษา');
-    return;
-  }
 
-  const data = new URLSearchParams();
-  data.append('status', 'ว่าง');
-  data.append('name', '-');
-  data.append('studentID', inputID);
-  data.append('email', '-');
-  data.append('table', selectedTable);
+  if (selectedTable === 1) {
+    const user = JSON.parse(localStorage.getItem('table1User'));
+    if (user && inputID === user.studentID) {
+      const data = new URLSearchParams();
+      data.append('status', 'ว่าง');
+      data.append('name', user.name);
+      data.append('studentID', user.studentID);
+      data.append('email', user.email);
 
-  await fetch(scriptURL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: data
-  });
-
-  showMainPage();
-}
-
-async function updateUI() {
-  try {
-    const response = await fetch(scriptURL);
-    const tableStatus = await response.json();
-
-    // Table 1
-    const status1 = tableStatus.table1;
-    document.getElementById('status1').textContent = status1 === 'จองแล้ว' ? 'BOOKED' : 'AVAILABLE';
-    document.getElementById('status1').style.backgroundColor = status1 === 'จองแล้ว' ? '#e53935' : '#4caf50';
-    document.getElementById('name1').textContent = status1 === 'จองแล้ว' ? '-' : '-';
-    document.getElementById('loginButton1').classList.toggle('hidden', status1 === 'จองแล้ว');
-    document.getElementById('logoutButton1').classList.toggle('hidden', status1 !== 'จองแล้ว');
-
-    // Table 2
-    const status2 = tableStatus.table2;
-    document.getElementById('status2').textContent = status2 === 'จองแล้ว' ? 'BOOKED' : 'AVAILABLE';
-    document.getElementById('status2').style.backgroundColor = status2 === 'จองแล้ว' ? '#e53935' : '#4caf50';
-    document.getElementById('name2').textContent = status2 === 'จองแล้ว' ? '-' : '-';
-    document.getElementById('loginButton2').classList.toggle('hidden', status2 === 'จองแล้ว');
-    document.getElementById('logoutButton2').classList.toggle('hidden', status2 !== 'จองแล้ว');
-
-  } catch (error) {
-    console.error('Error updating UI:', error);
+      fetch(scriptURL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: data
+      });
+      localStorage.removeItem('table1User');
+      showMainPage();
+    } else {
+      alert('รหัสนักศึกษาไม่ถูกต้อง');
+    }
+  } else if (selectedTable === 2) {
+    const user = JSON.parse(localStorage.getItem('table2User'));
+    if (user && inputID === user.studentID) {
+      localStorage.removeItem('table2User');
+      showMainPage();
+    } else {
+      alert('รหัสนักศึกษาไม่ถูกต้อง');
+    }
   }
 }
 
-setInterval(updateUI, 5000);
+function updateUI() {
+  const table1User = JSON.parse(localStorage.getItem('table1User'));
+  if (table1User) {
+    document.getElementById('status1').textContent = 'BOOKED';
+    document.getElementById('status1').style.backgroundColor = '#e53935';
+    document.getElementById('name1').textContent = table1User.name;
+    document.getElementById('loginButton1').classList.add('hidden');
+    document.getElementById('logoutButton1').classList.remove('hidden');
+  } else {
+    document.getElementById('status1').textContent = 'AVAILABLE';
+    document.getElementById('status1').style.backgroundColor = '#4caf50';
+    document.getElementById('name1').textContent = '-';
+    document.getElementById('loginButton1').classList.remove('hidden');
+    document.getElementById('logoutButton1').classList.add('hidden');
+  }
+
+  const table2User = JSON.parse(localStorage.getItem('table2User'));
+  if (table2User) {
+    document.getElementById('status2').textContent = 'BOOKED';
+    document.getElementById('status2').style.backgroundColor = '#e53935';
+    document.getElementById('name2').textContent = table2User.name;
+    document.getElementById('loginButton2').classList.add('hidden');
+    document.getElementById('logoutButton2').classList.remove('hidden');
+  } else {
+    document.getElementById('status2').textContent = 'AVAILABLE';
+    document.getElementById('status2').style.backgroundColor = '#4caf50';
+    document.getElementById('name2').textContent = '-';
+    document.getElementById('loginButton2').classList.remove('hidden');
+    document.getElementById('logoutButton2').classList.add('hidden');
+  }
+}
+
 updateUI();
 </script>
 
 </body>
-</html>
+</html> 
