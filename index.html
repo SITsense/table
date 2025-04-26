@@ -180,7 +180,7 @@ function confirmLogin() {
   const user = { name, studentID, email };
 
   const data = new URLSearchParams();
-  data.append('status', 'จองแล้ว');
+  data.append('status', 'จองแล้ว');  // เปลี่ยนสถานะเป็น "จองแล้ว"
   data.append('name', name);
   data.append('studentID', studentID);
   data.append('email', email);
@@ -191,11 +191,13 @@ function confirmLogin() {
     body: data
   }).then(response => response.text())
     .then(result => {
+      console.log("ข้อมูลที่ส่งไป:", result);  // เพิ่มบรรทัดนี้เพื่อตรวจสอบ
       showMainPage();
     }).catch(error => {
       alert('เกิดข้อผิดพลาด: ' + error);
     });
 }
+
 
 function confirmLogout() {
   const inputID = document.getElementById('logoutStudentIDInput').value.trim();
