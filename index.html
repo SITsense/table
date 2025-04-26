@@ -180,7 +180,7 @@ function confirmLogin() {
   const user = { name, studentID, email };
 
   const data = new URLSearchParams();
-  data.append('status', 'จองแล้ว');  // เปลี่ยนสถานะเป็น "จองแล้ว"
+  data.append('status', 'จองแล้ว');
   data.append('name', name);
   data.append('studentID', studentID);
   data.append('email', email);
@@ -191,13 +191,11 @@ function confirmLogin() {
     body: data
   }).then(response => response.text())
     .then(result => {
-      console.log("ข้อมูลที่ส่งไป:", result);  // เพิ่มบรรทัดนี้เพื่อตรวจสอบ
       showMainPage();
     }).catch(error => {
       alert('เกิดข้อผิดพลาด: ' + error);
     });
 }
-
 
 function confirmLogout() {
   const inputID = document.getElementById('logoutStudentIDInput').value.trim();
@@ -221,7 +219,7 @@ function confirmLogout() {
 }
 
 function updateUI() {
-  fetch(scriptURL)  // ดึงข้อมูลจาก Google Sheets โดยตรง
+  fetch(scriptURL + '?action=getStatus')
     .then(response => response.json())
     .then(data => {
       data.forEach(item => {
@@ -229,7 +227,6 @@ function updateUI() {
         const status = item.status;
         const name = item.name;
 
-        // อัพเดตสถานะและชื่อของโต๊ะที่ถูกจองหรือว่าง
         if (table == 1) {
           document.getElementById('status1').textContent = status === 'จองแล้ว' ? 'BOOKED' : 'AVAILABLE';
           document.getElementById('name1').textContent = name || '-';
@@ -245,7 +242,6 @@ function updateUI() {
     })
     .catch(error => console.error('Error updating UI:', error));
 }
-
 
 // เรียก updateUI ทันทีเมื่อโหลดหน้า
 document.addEventListener('DOMContentLoaded', updateUI);
