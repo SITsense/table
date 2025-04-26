@@ -2,18 +2,98 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SITsense Table Booking</title>
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; background: #f0f0f0; }
-    h1 { text-align: center; }
-    .hidden { display: none; }
-    .table-card, .form-card { background: white; padding: 20px; margin: 20px auto; max-width: 400px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-    .table-name { font-size: 20px; font-weight: bold; margin-bottom: 10px; }
-    .info-line { margin: 5px 0; }
-    button { margin-top: 10px; padding: 10px; width: 100%; border: none; background: #007bff; color: white; border-radius: 5px; font-size: 16px; cursor: pointer; }
-    button.hidden { display: none; }
-    input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; }
+    body {
+      font-family: 'Kanit', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f2f2f2;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 {
+      margin-top: 30px;
+      color: #333;
+      font-size: 2.5rem;
+    }
+
+    .table-card, .form-card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      padding: 24px;
+      margin: 20px;
+      width: 320px;
+      text-align: center;
+      transition: transform 0.3s;
+    }
+
+    .table-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .table-name {
+      font-size: 1.8rem;
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: #555;
+    }
+
+    .info-line {
+      margin: 8px 0;
+      font-size: 1.1rem;
+    }
+
+    .status {
+      padding: 4px 10px;
+      border-radius: 20px;
+      background-color: #4caf50;
+      color: white;
+      font-weight: bold;
+      font-size: 1rem;
+    }
+
+    button {
+      margin: 10px 5px 0;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 12px;
+      background-color: #1976d2;
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #1565c0;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    input[type="text"], input[type="email"] {
+      width: 90%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      font-size: 1rem;
+    }
+
+    /* Layout */
+    #mainPage, #loginPage, #logoutPage {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
   </style>
 </head>
 
@@ -55,41 +135,31 @@
 </div>
 
 <script>
-// URL Google Apps Script ของคุณ
-const scriptURL = 'https://script.google.com/macros/s/AKfycbz3BAoUZr7_uy2BFocspCqgMlf9lfM_fcUea4J6LWBlinNBR6KjIk2HKNI5sblC6T0/exec';
-
+// *** (โค้ด JavaScript เดิม) ***
 let selectedTable = null;
+const scriptURL = 'https://script.google.com/macros/s/AKfycbz3BAoUZr7_uy2BFocspCqgMlf9lfM_fcUea4J6LWBlinNBR6KjIk2HKNI5sblC6T0/exec'; 
 
-// ฟังก์ชันโหลดสถานะโต๊ะ
 function updateUI() {
-  fetch(scriptURL)
+  fetch(scriptURL + '?action=getStatus')
     .then(response => response.json())
     .then(data => {
-      // สมมติใช้ข้อมูลแถวสุดท้าย (ล่าสุด)
-      const latest = data[data.length - 1];
-      const table = latest.table;
-      const status = latest.status;
-      const name = latest.name;
-
-      if (status === 'จองแล้ว') {
-        document.getElementById('status1').textContent = 'BOOKED';
-        document.getElementById('status1').style.backgroundColor = '#e53935';
+      const { status1, name1, email1 } = data;
+      document.getElementById('status1').textContent = status1 === 'จองแล้ว' ? 'BOOKED' : 'AVAILABLE';
+      document.getElementById('status1').style.backgroundColor = status1 === 'จองแล้ว' ? '#e53935' : '#4caf50';
+      document.getElementById('name1').textContent = name1 || '-';
+      if (status1 === 'จองแล้ว') {
         document.getElementById('loginButton1').classList.add('hidden');
         document.getElementById('logoutButton1').classList.remove('hidden');
       } else {
-        document.getElementById('status1').textContent = 'AVAILABLE';
-        document.getElementById('status1').style.backgroundColor = '#4caf50';
         document.getElementById('loginButton1').classList.remove('hidden');
         document.getElementById('logoutButton1').classList.add('hidden');
       }
-      document.getElementById('name1').textContent = name || '-';
     })
     .catch(error => {
-      console.error('Error:', error);
+      console.error('Error fetching table status:', error);
     });
 }
 
-// ฟังก์ชันไปหน้า Login
 function goToLogin(table) {
   selectedTable = table;
   document.getElementById('mainPage').classList.add('hidden');
@@ -97,7 +167,6 @@ function goToLogin(table) {
   document.getElementById('loginTableNumber').textContent = table;
 }
 
-// ฟังก์ชันไปหน้า Logout
 function goToLogout(table) {
   selectedTable = table;
   document.getElementById('mainPage').classList.add('hidden');
@@ -105,28 +174,28 @@ function goToLogout(table) {
   document.getElementById('logoutTableNumber').textContent = table;
 }
 
-// กลับไปหน้าแรก
 function showMainPage() {
   document.getElementById('mainPage').classList.remove('hidden');
   document.getElementById('loginPage').classList.add('hidden');
   document.getElementById('logoutPage').classList.add('hidden');
-  updateUI(); // อัปเดตสถานะใหม่
+  updateUI();
 }
 
-// ยืนยัน Login
 function confirmLogin() {
   const name = document.getElementById('nameInput').value.trim();
   const studentID = document.getElementById('studentIDInput').value.trim();
   const email = document.getElementById('emailInput').value.trim();
 
   if (!name || !studentID || !email) {
-    alert('กรุณากรอกข้อมูลให้ครบ');
+    alert("กรุณากรอกข้อมูลให้ครบ");
     return;
   }
   if (studentID.length !== 11 || isNaN(studentID)) {
-    alert('รหัสนักศึกษาต้องมี 11 ตัวเลขเท่านั้น');
+    alert("รหัสนักศึกษาต้องมี 11 ตัวเลขเท่านั้น");
     return;
   }
+
+  const user = { name, studentID, email };
 
   const data = new URLSearchParams();
   data.append('table', selectedTable);
@@ -141,49 +210,37 @@ function confirmLogin() {
     body: data
   }).then(response => response.text())
     .then(result => {
-      alert('Login สำเร็จ');
+      localStorage.setItem(`table${selectedTable}User`, JSON.stringify(user));
       showMainPage();
     }).catch(error => {
       alert('เกิดข้อผิดพลาด: ' + error);
     });
 }
 
-// ยืนยัน Logout
 function confirmLogout() {
   const inputID = document.getElementById('logoutStudentIDInput').value.trim();
 
-  fetch(scriptURL)
-    .then(response => response.json())
-    .then(data => {
-      const latest = data[data.length - 1];
-      const correctID = latest.studentID;
+  const user = JSON.parse(localStorage.getItem(`table${selectedTable}User`));
+  if (user && inputID === user.studentID) {
+    const data = new URLSearchParams();
+    data.append('table', selectedTable);
+    data.append('status', 'ว่าง');
+    data.append('name', user.name);
+    data.append('studentID', user.studentID);
+    data.append('email', user.email);
 
-      if (inputID === correctID) {
-        const dataOut = new URLSearchParams();
-        dataOut.append('table', selectedTable);
-        dataOut.append('status', 'ว่าง');
-        dataOut.append('name', latest.name);
-        dataOut.append('studentID', latest.studentID);
-        dataOut.append('email', latest.email);
-
-        fetch(scriptURL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: dataOut
-        }).then(response => response.text())
-          .then(result => {
-            alert('Logout สำเร็จ');
-            showMainPage();
-          }).catch(error => {
-            alert('เกิดข้อผิดพลาดตอน Logout: ' + error);
-          });
-      } else {
-        alert('รหัสนักศึกษาไม่ถูกต้อง');
-      }
+    fetch(scriptURL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: data
     });
+    localStorage.removeItem(`table${selectedTable}User`);
+    showMainPage();
+  } else {
+    alert('รหัสนักศึกษาไม่ถูกต้อง');
+  }
 }
 
-// โหลดหน้าครั้งแรก
 updateUI();
 </script>
 
