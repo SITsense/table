@@ -237,21 +237,30 @@ function confirmLogout() {
 }
 
 function updateUI() {
-  const table1User = JSON.parse(localStorage.getItem('table1User'));
-  if (table1User) {
-    document.getElementById('status1').textContent = 'BOOKED';
-    document.getElementById('status1').style.backgroundColor = '#e53935';
-    document.getElementById('name1').textContent = table1User.name;
-    document.getElementById('loginButton1').classList.add('hidden');
-    document.getElementById('logoutButton1').classList.remove('hidden');
-  } else {
-    document.getElementById('status1').textContent = 'AVAILABLE';
-    document.getElementById('status1').style.backgroundColor = '#4caf50';
-    document.getElementById('name1').textContent = '-';
-    document.getElementById('loginButton1').classList.remove('hidden');
-    document.getElementById('logoutButton1').classList.add('hidden');
+  function updateUI() {
+  fetch(scriptURL)
+    .then(response => response.json())
+    .then(data => {
+      const status = data.status; // ได้สถานะจากชีตมา
+      if (status === 'จองแล้ว') {
+        document.getElementById('status1').textContent = 'BOOKED';
+        document.getElementById('status1').style.backgroundColor = '#e53935';
+        // อยากได้ชื่อผู้จองด้วย ต้องส่งข้อมูล name มาด้วยจาก doGet
+        document.getElementById('name1').textContent = data.name || '-';
+        document.getElementById('loginButton1').classList.add('hidden');
+        document.getElementById('logoutButton1').classList.remove('hidden');
+      } else {
+        document.getElementById('status1').textContent = 'AVAILABLE';
+        document.getElementById('status1').style.backgroundColor = '#4caf50';
+        document.getElementById('name1').textContent = '-';
+        document.getElementById('loginButton1').classList.remove('hidden');
+        document.getElementById('logoutButton1').classList.add('hidden');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
   }
-
   const table2User = JSON.parse(localStorage.getItem('table2User'));
   if (table2User) {
     document.getElementById('status2').textContent = 'BOOKED';
