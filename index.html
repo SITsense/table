@@ -6,119 +6,144 @@
   <title>SITsense Table Booking</title>
   <style>
     body {
-      font-family: 'Prompt', sans-serif;
-      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       padding: 20px;
-      background: #f0f2f5;
-      text-align: center;
+      background: #eef6f9;
+      color: #333;
     }
     h1 {
-      color: #2c3e50;
+      font-size: 32px;
+      margin-bottom: 30px;
+      text-align: center;
+      color: #1e3a5f;
     }
-    .card, .form-container {
+    .hidden { display: none; }
+    .table-card, .form-card {
       background: white;
-      padding: 20px;
-      margin: 20px auto;
-      border-radius: 12px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      width: 300px;
+      padding: 24px;
+      margin-bottom: 20px;
+      border-radius: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
     }
     .status {
-      padding: 5px 10px;
-      border-radius: 8px;
-      color: white;
-      font-weight: bold;
       display: inline-block;
+      padding: 6px 12px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: bold;
+      color: white;
+      background-color: #4caf50;
       margin-bottom: 10px;
     }
-    .login-btn, .logout-btn {
-      padding: 10px 20px;
-      background: #3498db;
-      color: white;
-      border: none;
-      border-radius: 8px;
+    button {
+      margin-top: 12px;
+      padding: 14px;
+      width: 100%;
       font-size: 16px;
+      border: none;
+      border-radius: 12px;
+      font-weight: bold;
+      background: #007acc;
+      color: white;
       cursor: pointer;
-      margin-top: 10px;
+      transition: background 0.3s, transform 0.2s;
     }
-    .logout-btn {
-      background: #e74c3c;
+    button:hover {
+      background: #005fa3;
+      transform: translateY(-2px);
+    }
+    h2 {
+      margin-bottom: 20px;
+      font-size: 24px;
+      text-align: center;
+      color: #1e3a5f;
     }
     input {
-      width: 90%;
-      padding: 8px;
-      margin: 8px 0;
+      width: 100%;
+      padding: 16px;
+      margin-bottom: 16px;
+      border-radius: 14px;
       border: 1px solid #ccc;
-      border-radius: 8px;
+      font-size: 16px;
+      box-sizing: border-box;
+      background: #f8f9fa;
+      transition: border-color 0.3s, box-shadow 0.3s;
     }
-    .hidden {
-      display: none;
+    input:focus {
+      border-color: #007acc;
+      box-shadow: 0 0 8px rgba(0, 122, 204, 0.4);
+      background: #ffffff;
+      outline: none;
+    }
+    .table-name {
+      font-size: 20px;
+      margin-bottom: 12px;
+      color: #444;
+    }
+    .info-line {
+      margin: 6px 0;
     }
   </style>
 </head>
 
 <body>
 
-<h1>SITsense Table Booking</h1>
+<h1>SITsense</h1>
 
 <!-- หน้าหลัก -->
-<div id="mainCard" class="card">
-  <h2>Table 1</h2>
-  <p>Status: <span id="status" class="status">Loading...</span></p>
-  <p>Name: <span id="name">-</span></p>
-  <button id="loginBtn" class="login-btn" onclick="showLoginForm()">Login</button>
-  <button id="logoutBtn" class="logout-btn hidden" onclick="confirmLogout()">Logout</button>
+<div id="mainCard" class="table-card">
+  <div class="table-name">Table 1</div>
+  <div class="info-line">Status: <span id="status" class="status">Loading...</span></div>
+  <div class="info-line">Name: <span id="name">-</span></div>
+  <button id="loginBtn" onclick="showLoginForm()">Login</button>
+  <button id="logoutBtn" class="hidden" style="background:#e74c3c;" onclick="confirmLogout()">Logout</button>
 </div>
 
 <!-- ฟอร์ม Login -->
-<div id="loginForm" class="card hidden">
+<div id="loginForm" class="form-card hidden">
   <h2>Login</h2>
-  <div class="form-container">
-    <input type="text" id="nameInput" placeholder="ชื่อ" required>
-    <input type="text" id="studentIDInput" placeholder="รหัสนักศึกษา 11 หลัก" required>
-    <input type="email" id="emailInput" placeholder="อีเมล" required>
-    <br>
-    <button class="login-btn" onclick="submitLogin()">ยืนยัน Login</button>
-    <button style="margin-top:10px;" onclick="cancelLogin()">ยกเลิก</button>
-  </div>
+  <input type="text" id="nameInput" placeholder="ชื่อ" required>
+  <input type="text" id="studentIDInput" placeholder="รหัสนักศึกษา 11 หลัก" required>
+  <input type="email" id="emailInput" placeholder="อีเมล" required>
+  <button onclick="submitLogin()">ยืนยัน Login</button>
+  <button style="background:#ccc; color:#333;" onclick="cancelLogin()">ยกเลิก</button>
 </div>
 
 <!-- ฟอร์ม Logout -->
-<div id="logoutForm" class="card hidden">
+<div id="logoutForm" class="form-card hidden">
   <h2>Logout</h2>
-  <div class="form-container">
-    <input type="text" id="logoutStudentIDInput" placeholder="กรอกรหัสนักศึกษาเพื่อยืนยัน" required>
-    <br>
-    <button class="logout-btn" onclick="submitLogout()">ยืนยัน Logout</button>
-    <button style="margin-top:10px;" onclick="cancelLogout()">ยกเลิก</button>
-  </div>
+  <input type="text" id="logoutStudentIDInput" placeholder="กรอกรหัสนักศึกษาเพื่อยืนยัน" required>
+  <button style="background:#e74c3c;" onclick="submitLogout()">ยืนยัน Logout</button>
+  <button style="background:#ccc; color:#333;" onclick="cancelLogout()">ยกเลิก</button>
 </div>
 
 <script>
 // ตั้งค่าเบื้องต้น
 const tableNumber = 1;
-const scriptURL = 'https://script.google.com/macros/s/AKfycbz3BAoUZr7_uy2BFocspCqgMlf9lfM_fcUea4J6LWBlinNBR6KjIk2HKNI5sblC6T0/exec'; // เปลี่ยนเป็น URL ของคุณเอง
+const scriptURL = 'https://script.google.com/macros/s/AKfycbz3BAoUZr7_uy2BFocspCqgMlf9lfM_fcUea4J6LWBlinNBR6KjIk2HKNI5sblC6T0/exec'; // เปลี่ยนเป็นของคุณ
 
 // โหลดสถานะโต๊ะจาก localStorage และ server
 function updateUI() {
-  // 1. โหลดข้อมูลจาก localStorage มาก่อน (ข้อมูลเก่า)
+  // โหลดจาก localStorage ก่อน
   const cached = JSON.parse(localStorage.getItem(`table${tableNumber}CachedData`));
   if (cached) {
     updatePage(cached.status1, cached.name1);
   }
 
-  // 2. จากนั้น Fetch ข้อมูลสดจาก Server (ข้อมูลใหม่)
+  // ดึงข้อมูลสดจาก Server
   fetch(scriptURL + '?action=getStatus')
     .then(response => response.json())
     .then(data => {
       updatePage(data.status1, data.name1);
-      // เก็บข้อมูลใหม่ลง localStorage
       localStorage.setItem(`table${tableNumber}CachedData`, JSON.stringify(data));
     })
     .catch(err => console.error('Error:', err));
 }
 
-// ฟังก์ชันอัปเดตหน้าจอ
+// อัปเดตหน้าจอ
 function updatePage(status1, name1) {
   const statusEl = document.getElementById('status');
   const nameEl = document.getElementById('name');
@@ -133,26 +158,22 @@ function updatePage(status1, name1) {
     logoutBtn.classList.remove('hidden');
   } else {
     statusEl.textContent = 'AVAILABLE';
-    statusEl.style.backgroundColor = '#2ecc71';
+    statusEl.style.backgroundColor = '#4caf50';
     nameEl.textContent = '-';
     loginBtn.classList.remove('hidden');
     logoutBtn.classList.add('hidden');
   }
 }
 
-// แสดงฟอร์ม Login
+// ฟอร์ม Login
 function showLoginForm() {
   document.getElementById('mainCard').classList.add('hidden');
   document.getElementById('loginForm').classList.remove('hidden');
 }
-
-// ยกเลิก Login
 function cancelLogin() {
   document.getElementById('loginForm').classList.add('hidden');
   document.getElementById('mainCard').classList.remove('hidden');
 }
-
-// ส่งข้อมูล Login
 function submitLogin() {
   const name = document.getElementById('nameInput').value.trim();
   const studentID = document.getElementById('studentIDInput').value.trim();
@@ -189,19 +210,15 @@ function submitLogin() {
   .catch(err => alert('เกิดข้อผิดพลาด: ' + err));
 }
 
-// แสดงฟอร์ม Logout
+// ฟอร์ม Logout
 function confirmLogout() {
   document.getElementById('mainCard').classList.add('hidden');
   document.getElementById('logoutForm').classList.remove('hidden');
 }
-
-// ยกเลิก Logout
 function cancelLogout() {
   document.getElementById('logoutForm').classList.add('hidden');
   document.getElementById('mainCard').classList.remove('hidden');
 }
-
-// ยืนยัน Logout หลังกรอกรหัส
 function submitLogout() {
   const inputID = document.getElementById('logoutStudentIDInput').value.trim();
   const user = JSON.parse(localStorage.getItem(`table${tableNumber}User`));
@@ -239,6 +256,7 @@ function submitLogout() {
 
 // โหลดข้อมูลทันทีที่เข้าเว็บ
 updateUI();
+setInterval(updateUI, 1000);
 </script>
 
 </body>
