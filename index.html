@@ -6,93 +6,71 @@
   <title>SITsense Table Booking</title>
   <style>
     body {
-      font-family: 'Kanit', sans-serif;
+      font-family: 'Arial', sans-serif;
+      background: #f9f9f9;
       margin: 0;
-      padding: 0;
-      background: #f2f2f2;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    h1 {
-      margin-top: 30px;
-      color: #333;
-      font-size: 2.5rem;
-    }
-
-    .table-card, .form-card {
-      background: #fff;
-      border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      padding: 24px;
-      margin: 20px;
-      width: 320px;
+      padding: 20px;
       text-align: center;
-      transition: transform 0.3s;
     }
-
-    .table-card:hover {
-      transform: translateY(-5px);
+    h1 {
+      color: #333;
     }
-
-    .table-name {
-      font-size: 1.8rem;
-      font-weight: bold;
-      margin-bottom: 10px;
-      color: #555;
-    }
-
-    .info-line {
-      margin: 8px 0;
-      font-size: 1.1rem;
-    }
-
-    .status {
-      padding: 4px 10px;
-      border-radius: 20px;
-      background-color: #4caf50;
-      color: white;
-      font-weight: bold;
-      font-size: 1rem;
-    }
-
-    button {
-      margin: 10px 5px 0;
-      padding: 10px 20px;
-      border: none;
+    .card {
+      background: white;
       border-radius: 12px;
-      background-color: #1976d2;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      padding: 20px;
+      margin: 20px auto;
+      width: 100%;
+      max-width: 400px;
+      transition: 0.3s;
+    }
+    .info-line {
+      margin: 10px 0;
+      font-size: 18px;
+    }
+    .status {
+      font-weight: bold;
+      padding: 4px 8px;
+      border-radius: 8px;
       color: white;
-      font-size: 1rem;
+    }
+    .status.available {
+      background-color: #4caf50;
+    }
+    .status.booked {
+      background-color: #e53935;
+    }
+    button {
+      padding: 10px 20px;
+      margin-top: 15px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
       cursor: pointer;
-      transition: background-color 0.3s;
+      transition: 0.2s;
     }
-
-    button:hover {
-      background-color: #1565c0;
+    .login-btn {
+      background-color: #2196f3;
+      color: white;
     }
-
-    .hidden {
-      display: none;
+    .logout-btn {
+      background-color: #e53935;
+      color: white;
     }
-
-    input[type="text"], input[type="email"] {
+    .form-container {
+      margin-top: 20px;
+    }
+    input {
       width: 90%;
       padding: 10px;
-      margin: 10px 0;
+      margin: 8px 0;
       border: 1px solid #ccc;
-      border-radius: 12px;
-      font-size: 1rem;
+      border-radius: 8px;
+      font-size: 16px;
     }
-
-    /* Layout */
-    #mainPage, #loginPage, #logoutPage {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      width: 100%;
+    .hidden {
+      display: none;
     }
   </style>
 </head>
@@ -101,84 +79,65 @@
 
 <h1>SITsense</h1>
 
-<!-- หน้าแสดงโต๊ะ -->
-<div id="mainPage">
-  <div class="table-card" id="table1">
-    <div class="table-name">Table 1</div>
-    <p class="info-line">Status: <span id="status1" class="status">AVAILABLE</span></p>
-    <p class="info-line">Name: <span id="name1">-</span></p>
-    <button id="loginButton1" onclick="goToLogin(1)">Login</button>
-    <button id="logoutButton1" class="hidden" onclick="goToLogout(1)">Logout</button>
-  </div>
+<div class="card" id="mainCard">
+  <div class="info-line">สถานะ: <span id="statusText" class="status available">AVAILABLE</span></div>
+  <div class="info-line">ชื่อผู้ใช้: <span id="userName">-</span></div>
+
+  <button id="loginButton" class="login-btn" onclick="showLoginForm()">Login</button>
+  <button id="logoutButton" class="logout-btn hidden" onclick="confirmLogout()">Logout</button>
 </div>
 
-<!-- หน้า Login -->
-<div id="loginPage" class="hidden">
-  <div class="form-card">
-    <h2>Login Table <span id="loginTableNumber"></span></h2>
+<div class="card hidden" id="loginForm">
+  <h2>Login</h2>
+  <div class="form-container">
     <input type="text" id="nameInput" placeholder="ชื่อ" required>
     <input type="text" id="studentIDInput" placeholder="รหัสนักศึกษา 11 หลัก" required>
     <input type="email" id="emailInput" placeholder="อีเมล" required>
-    <button onclick="confirmLogin()">ยืนยัน Login</button>
-    <button onclick="showMainPage()">ยกเลิก</button>
-  </div>
-</div>
-
-<!-- หน้า Logout -->
-<div id="logoutPage" class="hidden">
-  <div class="form-card">
-    <h2>Logout Table <span id="logoutTableNumber"></span></h2>
-    <input type="text" id="logoutStudentIDInput" placeholder="กรอกรหัสนักศึกษาเพื่อยืนยัน" required>
-    <button onclick="confirmLogout()">ยืนยัน Logout</button>
-    <button onclick="showMainPage()">ยกเลิก</button>
+    <br>
+    <button class="login-btn" onclick="confirmLogin()">ยืนยัน Login</button>
+    <button style="margin-top:10px;" onclick="hideLoginForm()">ยกเลิก</button>
   </div>
 </div>
 
 <script>
-// *** (โค้ด JavaScript เดิม) ***
-let selectedTable = null;
-const scriptURL = 'https://script.google.com/macros/s/AKfycbz3BAoUZr7_uy2BFocspCqgMlf9lfM_fcUea4J6LWBlinNBR6KjIk2HKNI5sblC6T0/exec'; 
+const scriptURL = 'https://script.google.com/macros/s/AKfycbz3BAoUZr7_uy2BFocspCqgMlf9lfM_fcUea4J6LWBlinNBR6KjIk2HKNI5sblC6T0/exec'; // เปลี่ยนเป็น URL จริงของคุณ
+const tableNumber = 1; // โต๊ะเบอร์ 1
 
 function updateUI() {
   fetch(scriptURL + '?action=getStatus')
     .then(response => response.json())
     .then(data => {
-      const { status1, name1, email1 } = data;
-      document.getElementById('status1').textContent = status1 === 'จองแล้ว' ? 'BOOKED' : 'AVAILABLE';
-      document.getElementById('status1').style.backgroundColor = status1 === 'จองแล้ว' ? '#e53935' : '#4caf50';
-      document.getElementById('name1').textContent = name1 || '-';
+      const { status1, name1 } = data;
+      const statusText = document.getElementById('statusText');
+      const userName = document.getElementById('userName');
+
       if (status1 === 'จองแล้ว') {
-        document.getElementById('loginButton1').classList.add('hidden');
-        document.getElementById('logoutButton1').classList.remove('hidden');
+        statusText.textContent = 'BOOKED';
+        statusText.classList.remove('available');
+        statusText.classList.add('booked');
+        userName.textContent = name1 || '-';
+        document.getElementById('loginButton').classList.add('hidden');
+        document.getElementById('logoutButton').classList.remove('hidden');
       } else {
-        document.getElementById('loginButton1').classList.remove('hidden');
-        document.getElementById('logoutButton1').classList.add('hidden');
+        statusText.textContent = 'AVAILABLE';
+        statusText.classList.remove('booked');
+        statusText.classList.add('available');
+        userName.textContent = '-';
+        document.getElementById('loginButton').classList.remove('hidden');
+        document.getElementById('logoutButton').classList.add('hidden');
       }
     })
-    .catch(error => {
-      console.error('Error fetching table status:', error);
-    });
+    .catch(error => console.error('Error:', error));
 }
 
-function goToLogin(table) {
-  selectedTable = table;
-  document.getElementById('mainPage').classList.add('hidden');
-  document.getElementById('loginPage').classList.remove('hidden');
-  document.getElementById('loginTableNumber').textContent = table;
+function showLoginForm() {
+  document.getElementById('mainCard').classList.add('hidden');
+  document.getElementById('loginForm').classList.remove('hidden');
 }
 
-function goToLogout(table) {
-  selectedTable = table;
-  document.getElementById('mainPage').classList.add('hidden');
-  document.getElementById('logoutPage').classList.remove('hidden');
-  document.getElementById('logoutTableNumber').textContent = table;
-}
-
-function showMainPage() {
-  document.getElementById('mainPage').classList.remove('hidden');
-  document.getElementById('loginPage').classList.add('hidden');
-  document.getElementById('logoutPage').classList.add('hidden');
-  updateUI();
+function hideLoginForm() {
+  document.getElementById('loginForm').classList.add('hidden');
+  document.getElementById('mainCard').classList.remove('hidden');
 }
 
 function confirmLogin() {
@@ -187,18 +146,16 @@ function confirmLogin() {
   const email = document.getElementById('emailInput').value.trim();
 
   if (!name || !studentID || !email) {
-    alert("กรุณากรอกข้อมูลให้ครบ");
+    alert('กรุณากรอกข้อมูลให้ครบ');
     return;
   }
   if (studentID.length !== 11 || isNaN(studentID)) {
-    alert("รหัสนักศึกษาต้องมี 11 ตัวเลขเท่านั้น");
+    alert('รหัสนักศึกษาต้องมี 11 ตัวเลข');
     return;
   }
 
-  const user = { name, studentID, email };
-
   const data = new URLSearchParams();
-  data.append('table', selectedTable);
+  data.append('table', tableNumber);
   data.append('status', 'จองแล้ว');
   data.append('name', name);
   data.append('studentID', studentID);
@@ -208,37 +165,40 @@ function confirmLogin() {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: data
-  }).then(response => response.text())
-    .then(result => {
-      localStorage.setItem(`table${selectedTable}User`, JSON.stringify(user));
-      showMainPage();
-    }).catch(error => {
-      alert('เกิดข้อผิดพลาด: ' + error);
-    });
+  })
+  .then(response => response.text())
+  .then(result => {
+    localStorage.setItem(`table${tableNumber}User`, JSON.stringify({ name, studentID, email }));
+    hideLoginForm();
+    updateUI();
+  })
+  .catch(error => alert('เกิดข้อผิดพลาด: ' + error));
 }
 
 function confirmLogout() {
-  const inputID = document.getElementById('logoutStudentIDInput').value.trim();
-
-  const user = JSON.parse(localStorage.getItem(`table${selectedTable}User`));
-  if (user && inputID === user.studentID) {
-    const data = new URLSearchParams();
-    data.append('table', selectedTable);
-    data.append('status', 'ว่าง');
-    data.append('name', user.name);
-    data.append('studentID', user.studentID);
-    data.append('email', user.email);
-
-    fetch(scriptURL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: data
-    });
-    localStorage.removeItem(`table${selectedTable}User`);
-    showMainPage();
-  } else {
-    alert('รหัสนักศึกษาไม่ถูกต้อง');
+  const user = JSON.parse(localStorage.getItem(`table${tableNumber}User`));
+  if (!user) {
+    alert('ไม่พบข้อมูลผู้ใช้');
+    return;
   }
+
+  const data = new URLSearchParams();
+  data.append('table', tableNumber);
+  data.append('status', 'ว่าง');
+  data.append('name', user.name);
+  data.append('studentID', user.studentID);
+  data.append('email', user.email);
+
+  fetch(scriptURL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: data
+  })
+  .then(() => {
+    localStorage.removeItem(`table${tableNumber}User`);
+    updateUI();
+  })
+  .catch(error => alert('เกิดข้อผิดพลาด: ' + error));
 }
 
 updateUI();
