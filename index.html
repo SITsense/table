@@ -5,7 +5,87 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SITsense Table Booking</title>
   <style>
-    /* (เหมือนเดิม) -- ไม่ต้องแก้ Style */
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 20px;
+      background: #eef6f9;
+      color: #333;
+    }
+    h1 {
+      font-size: 32px;
+      margin-bottom: 30px;
+      text-align: center;
+      color: #1e3a5f;
+    }
+    .hidden { display: none; }
+    .table-card, .form-card {
+      background: white;
+      padding: 24px;
+      margin-bottom: 20px;
+      border-radius: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .status {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: bold;
+      color: white;
+      background-color: #4caf50;
+      margin-bottom: 10px;
+    }
+    button {
+      margin-top: 12px;
+      padding: 14px;
+      width: 100%;
+      font-size: 16px;
+      border: none;
+      border-radius: 12px;
+      font-weight: bold;
+      background: #007acc;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+    }
+    button:hover {
+      background: #005fa3;
+      transform: translateY(-2px);
+    }
+    h2 {
+      margin-bottom: 20px;
+      font-size: 24px;
+      text-align: center;
+      color: #1e3a5f;
+    }
+    input {
+      width: 100%;
+      padding: 16px;
+      margin-bottom: 16px;
+      border-radius: 14px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+      box-sizing: border-box;
+      background: #f8f9fa;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    input:focus {
+      border-color: #007acc;
+      box-shadow: 0 0 8px rgba(0, 122, 204, 0.4);
+      background: #ffffff;
+      outline: none;
+    }
+    .table-name {
+      font-size: 20px;
+      margin-bottom: 12px;
+      color: #444;
+    }
+    .info-line {
+      margin: 6px 0;
+    }
   </style>
 </head>
 
@@ -56,7 +136,7 @@
 
 <script>
 let selectedTable = null;
-const scriptURL = 'https://script.google.com/macros/s/AKfycbz3BAoUZr7_uy2BFocspCqgMlf9lfM_fcUea4J6LWBlinNBR6KjIk2HKNI5sblC6T0/exec'; // เปลี่ยนเป็นของคุณเอง
+const scriptURL = 'https://script.google.com/macros/s/AKfycbz3BAoUZr7_uy2BFocspCqgMlf9lfM_fcUea4J6LWBlinNBR6KjIk2HKNI5sblC6T0/exec'; // เปลี่ยนตามของคุณ
 
 function goToLogin(table) {
   selectedTable = table;
@@ -97,65 +177,62 @@ function confirmLogin() {
     return;
   }
 
-  // 🔥 เพิ่มการตรวจสอบก่อนล็อกอิน
-  fetch(scriptURL + `?action=checkStudentID&studentID=${studentID}`)
-    .then(response => response.json())
-    .then(data => {
-      if (data.exists) {
-        alert("รหัสนักศึกษานี้ล็อกอินอยู่แล้วที่โต๊ะอื่น");
+  const user = { name, studentID, email };
+
+  if (selectedTable === 1) {
+    const data = new URLSearchParams();
+    data.append('status', 'จองแล้ว');
+    data.append('name', name);
+    data.append('studentID', studentID);
+    data.append('email', email);
+
+    fetch(scriptURL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: data
+    }).then(response => response.text())
+      .then(result => {
+        localStorage.setItem('table1User', JSON.stringify(user));
         showMainPage();
-      } else {
-        // ยังไม่ล็อกอิน → ทำการล็อกอินต่อ
-        const user = { name, studentID, email };
-
-        const postData = new URLSearchParams();
-        postData.append('action', 'login');
-        postData.append('status', 'จองแล้ว');
-        postData.append('name', name);
-        postData.append('studentID', studentID);
-        postData.append('email', email);
-        postData.append('table', selectedTable);
-
-        fetch(scriptURL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: postData
-        }).then(response => response.text())
-          .then(result => {
-            localStorage.setItem(`table${selectedTable}User`, JSON.stringify(user));
-            showMainPage();
-          }).catch(error => {
-            alert('เกิดข้อผิดพลาด: ' + error);
-          });
-      }
-    })
-    .catch(error => {
-      alert('เกิดข้อผิดพลาดในการตรวจสอบ: ' + error);
-    });
+      }).catch(error => {
+        alert('เกิดข้อผิดพลาด: ' + error);
+      });
+  } else if (selectedTable === 2) {
+    localStorage.setItem('table2User', JSON.stringify(user));
+    showMainPage();
+  }
 }
 
 function confirmLogout() {
   const inputID = document.getElementById('logoutStudentIDInput').value.trim();
 
-  const user = JSON.parse(localStorage.getItem(`table${selectedTable}User`));
-  if (user && inputID === user.studentID) {
-    const postData = new URLSearchParams();
-    postData.append('action', 'logout');
-    postData.append('studentID', user.studentID);
+  if (selectedTable === 1) {
+    const user = JSON.parse(localStorage.getItem('table1User'));
+    if (user && inputID === user.studentID) {
+      const data = new URLSearchParams();
+      data.append('status', 'ว่าง');
+      data.append('name', user.name);
+      data.append('studentID', user.studentID);
+      data.append('email', user.email);
 
-    fetch(scriptURL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: postData
-    }).then(response => response.text())
-      .then(result => {
-        localStorage.removeItem(`table${selectedTable}User`);
-        showMainPage();
-      }).catch(error => {
-        alert('เกิดข้อผิดพลาด: ' + error);
+      fetch(scriptURL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: data
       });
-  } else {
-    alert('รหัสนักศึกษาไม่ถูกต้อง');
+      localStorage.removeItem('table1User');
+      showMainPage();
+    } else {
+      alert('รหัสนักศึกษาไม่ถูกต้อง');
+    }
+  } else if (selectedTable === 2) {
+    const user = JSON.parse(localStorage.getItem('table2User'));
+    if (user && inputID === user.studentID) {
+      localStorage.removeItem('table2User');
+      showMainPage();
+    } else {
+      alert('รหัสนักศึกษาไม่ถูกต้อง');
+    }
   }
 }
 
