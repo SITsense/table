@@ -179,96 +179,72 @@ function confirmLogin() {
 
   const user = { name, studentID, email };
 
-  if (selectedTable === 1) {
-    const data = new URLSearchParams();
-    data.append('status', 'จองแล้ว');
-    data.append('name', name);
-    data.append('studentID', studentID);
-    data.append('email', email);
+  const data = new URLSearchParams();
+  data.append('status', 'จองแล้ว');
+  data.append('name', name);
+  data.append('studentID', studentID);
+  data.append('email', email);
 
-    fetch(scriptURL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: data
-    }).then(response => response.text())
-      .then(result => {
-        localStorage.setItem('table1User', JSON.stringify(user));
-        showMainPage();
-      }).catch(error => {
-        alert('เกิดข้อผิดพลาด: ' + error);
-      });
-  } else if (selectedTable === 2) {
-    localStorage.setItem('table2User', JSON.stringify(user));
-    showMainPage();
-  }
+  fetch(scriptURL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: data
+  }).then(response => response.text())
+    .then(result => {
+      showMainPage();
+    }).catch(error => {
+      alert('เกิดข้อผิดพลาด: ' + error);
+    });
 }
 
 function confirmLogout() {
   const inputID = document.getElementById('logoutStudentIDInput').value.trim();
 
   if (selectedTable === 1) {
-    const user = JSON.parse(localStorage.getItem('table1User'));
-    if (user && inputID === user.studentID) {
-      const data = new URLSearchParams();
-      data.append('status', 'ว่าง');
-      data.append('name', user.name);
-      data.append('studentID', user.studentID);
-      data.append('email', user.email);
+    const data = new URLSearchParams();
+    data.append('status', 'ว่าง');
+    data.append('name', '');
+    data.append('studentID', inputID);
+    data.append('email', '');
 
-      fetch(scriptURL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: data
-      });
-      localStorage.removeItem('table1User');
-      showMainPage();
-    } else {
-      alert('รหัสนักศึกษาไม่ถูกต้อง');
-    }
+    fetch(scriptURL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: data
+    });
+    showMainPage();
   } else if (selectedTable === 2) {
-    const user = JSON.parse(localStorage.getItem('table2User'));
-    if (user && inputID === user.studentID) {
-      localStorage.removeItem('table2User');
-      showMainPage();
-    } else {
-      alert('รหัสนักศึกษาไม่ถูกต้อง');
-    }
+    showMainPage();
   }
 }
 
 function updateUI() {
-  const table1User = JSON.parse(localStorage.getItem('table1User'));
-  if (table1User) {
-    document.getElementById('status1').textContent = 'BOOKED';
-    document.getElementById('status1').style.backgroundColor = '#e53935';
-    document.getElementById('name1').textContent = table1User.name;
-    document.getElementById('loginButton1').classList.add('hidden');
-    document.getElementById('logoutButton1').classList.remove('hidden');
-  } else {
-    document.getElementById('status1').textContent = 'AVAILABLE';
-    document.getElementById('status1').style.backgroundColor = '#4caf50';
-    document.getElementById('name1').textContent = '-';
-    document.getElementById('loginButton1').classList.remove('hidden');
-    document.getElementById('logoutButton1').classList.add('hidden');
-  }
+  fetch(scriptURL + '?action=getStatus')
+    .then(response => response.json())
+    .then(data => {
+      data.forEach(item => {
+        const table = item.table;
+        const status = item.status;
+        const name = item.name;
 
-  const table2User = JSON.parse(localStorage.getItem('table2User'));
-  if (table2User) {
-    document.getElementById('status2').textContent = 'BOOKED';
-    document.getElementById('status2').style.backgroundColor = '#e53935';
-    document.getElementById('name2').textContent = table2User.name;
-    document.getElementById('loginButton2').classList.add('hidden');
-    document.getElementById('logoutButton2').classList.remove('hidden');
-  } else {
-    document.getElementById('status2').textContent = 'AVAILABLE';
-    document.getElementById('status2').style.backgroundColor = '#4caf50';
-    document.getElementById('name2').textContent = '-';
-    document.getElementById('loginButton2').classList.remove('hidden');
-    document.getElementById('logoutButton2').classList.add('hidden');
-  }
+        if (table == 1) {
+          document.getElementById('status1').textContent = status === 'จองแล้ว' ? 'BOOKED' : 'AVAILABLE';
+          document.getElementById('name1').textContent = name || '-';
+          document.getElementById('loginButton1').classList.toggle('hidden', status === 'จองแล้ว');
+          document.getElementById('logoutButton1').classList.toggle('hidden', status !== 'จองแล้ว');
+        } else if (table == 2) {
+          document.getElementById('status2').textContent = status === 'จองแล้ว' ? 'BOOKED' : 'AVAILABLE';
+          document.getElementById('name2').textContent = name || '-';
+          document.getElementById('loginButton2').classList.toggle('hidden', status === 'จองแล้ว');
+          document.getElementById('logoutButton2').classList.toggle('hidden', status !== 'จองแล้ว');
+        }
+      });
+    })
+    .catch(error => console.error('Error updating UI:', error));
 }
 
-updateUI();
+// เรียก updateUI ทันทีเมื่อโหลดหน้า
+document.addEventListener('DOMContentLoaded', updateUI);
 </script>
 
 </body>
