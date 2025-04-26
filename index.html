@@ -6,68 +6,50 @@
   <title>SITsense Table Booking</title>
   <style>
     body {
-      font-family: 'Arial', sans-serif;
-      background: #f9f9f9;
+      font-family: 'Prompt', sans-serif;
       margin: 0;
       padding: 20px;
+      background: #f0f2f5;
       text-align: center;
     }
     h1 {
-      color: #333;
+      color: #2c3e50;
     }
-    .card {
+    .card, .form-container {
       background: white;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
       padding: 20px;
       margin: 20px auto;
-      width: 100%;
-      max-width: 400px;
-      transition: 0.3s;
-    }
-    .info-line {
-      margin: 10px 0;
-      font-size: 18px;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      width: 300px;
     }
     .status {
-      font-weight: bold;
-      padding: 4px 8px;
+      padding: 5px 10px;
       border-radius: 8px;
       color: white;
+      font-weight: bold;
+      display: inline-block;
+      margin-bottom: 10px;
     }
-    .status.available {
-      background-color: #4caf50;
-    }
-    .status.booked {
-      background-color: #e53935;
-    }
-    button {
+    .login-btn, .logout-btn {
       padding: 10px 20px;
-      margin-top: 15px;
-      font-size: 16px;
+      background: #3498db;
+      color: white;
       border: none;
       border-radius: 8px;
+      font-size: 16px;
       cursor: pointer;
-      transition: 0.2s;
-    }
-    .login-btn {
-      background-color: #2196f3;
-      color: white;
+      margin-top: 10px;
     }
     .logout-btn {
-      background-color: #e53935;
-      color: white;
-    }
-    .form-container {
-      margin-top: 20px;
+      background: #e74c3c;
     }
     input {
       width: 90%;
-      padding: 10px;
+      padding: 8px;
       margin: 8px 0;
       border: 1px solid #ccc;
       border-radius: 8px;
-      font-size: 16px;
     }
     .hidden {
       display: none;
@@ -77,70 +59,88 @@
 
 <body>
 
-<h1>SITsense</h1>
+<h1>SITsense Table Booking</h1>
 
-<div class="card" id="mainCard">
-  <div class="info-line">สถานะ: <span id="statusText" class="status available">AVAILABLE</span></div>
-  <div class="info-line">ชื่อผู้ใช้: <span id="userName">-</span></div>
-
-  <button id="loginButton" class="login-btn" onclick="showLoginForm()">Login</button>
-  <button id="logoutButton" class="logout-btn hidden" onclick="confirmLogout()">Logout</button>
+<!-- หน้าหลัก -->
+<div id="mainCard" class="card">
+  <h2>Table 1</h2>
+  <p>Status: <span id="status" class="status">Loading...</span></p>
+  <p>Name: <span id="name">-</span></p>
+  <button id="loginBtn" class="login-btn" onclick="showLoginForm()">Login</button>
+  <button id="logoutBtn" class="logout-btn hidden" onclick="confirmLogout()">Logout</button>
 </div>
 
-<div class="card hidden" id="loginForm">
+<!-- ฟอร์ม Login -->
+<div id="loginForm" class="card hidden">
   <h2>Login</h2>
   <div class="form-container">
     <input type="text" id="nameInput" placeholder="ชื่อ" required>
     <input type="text" id="studentIDInput" placeholder="รหัสนักศึกษา 11 หลัก" required>
     <input type="email" id="emailInput" placeholder="อีเมล" required>
     <br>
-    <button class="login-btn" onclick="confirmLogin()">ยืนยัน Login</button>
-    <button style="margin-top:10px;" onclick="hideLoginForm()">ยกเลิก</button>
+    <button class="login-btn" onclick="submitLogin()">ยืนยัน Login</button>
+    <button style="margin-top:10px;" onclick="cancelLogin()">ยกเลิก</button>
+  </div>
+</div>
+
+<!-- ฟอร์ม Logout ยืนยันรหัส -->
+<div id="logoutForm" class="card hidden">
+  <h2>Logout</h2>
+  <div class="form-container">
+    <input type="text" id="logoutStudentIDInput" placeholder="กรอกรหัสนักศึกษาเพื่อยืนยัน" required>
+    <br>
+    <button class="logout-btn" onclick="submitLogout()">ยืนยัน Logout</button>
+    <button style="margin-top:10px;" onclick="cancelLogout()">ยกเลิก</button>
   </div>
 </div>
 
 <script>
-const scriptURL = 'https://script.google.com/macros/s/AKfycbz3BAoUZr7_uy2BFocspCqgMlf9lfM_fcUea4J6LWBlinNBR6KjIk2HKNI5sblC6T0/exec'; // เปลี่ยนเป็น URL จริงของคุณ
-const tableNumber = 1; // โต๊ะเบอร์ 1
+// ตั้งค่าเบื้องต้น
+const tableNumber = 1;
+const scriptURL = 'https://script.google.com/macros/s/AKfycbz3BAoUZr7_uy2BFocspCqgMlf9lfM_fcUea4J6LWBlinNBR6KjIk2HKNI5sblC6T0/exec'; // เปลี่ยนเป็น URL ของคุณเอง
 
+// โหลดสถานะโต๊ะจาก Google Sheet
 function updateUI() {
   fetch(scriptURL + '?action=getStatus')
     .then(response => response.json())
     .then(data => {
       const { status1, name1 } = data;
-      const statusText = document.getElementById('statusText');
-      const userName = document.getElementById('userName');
+      const statusEl = document.getElementById('status');
+      const nameEl = document.getElementById('name');
+      const loginBtn = document.getElementById('loginBtn');
+      const logoutBtn = document.getElementById('logoutBtn');
 
       if (status1 === 'จองแล้ว') {
-        statusText.textContent = 'BOOKED';
-        statusText.classList.remove('available');
-        statusText.classList.add('booked');
-        userName.textContent = name1 || '-';
-        document.getElementById('loginButton').classList.add('hidden');
-        document.getElementById('logoutButton').classList.remove('hidden');
+        statusEl.textContent = 'BOOKED';
+        statusEl.style.backgroundColor = '#e74c3c';
+        nameEl.textContent = name1 || '-';
+        loginBtn.classList.add('hidden');
+        logoutBtn.classList.remove('hidden');
       } else {
-        statusText.textContent = 'AVAILABLE';
-        statusText.classList.remove('booked');
-        statusText.classList.add('available');
-        userName.textContent = '-';
-        document.getElementById('loginButton').classList.remove('hidden');
-        document.getElementById('logoutButton').classList.add('hidden');
+        statusEl.textContent = 'AVAILABLE';
+        statusEl.style.backgroundColor = '#2ecc71';
+        nameEl.textContent = '-';
+        loginBtn.classList.remove('hidden');
+        logoutBtn.classList.add('hidden');
       }
     })
-    .catch(error => console.error('Error:', error));
+    .catch(err => console.error('Error:', err));
 }
 
+// แสดงฟอร์ม Login
 function showLoginForm() {
   document.getElementById('mainCard').classList.add('hidden');
   document.getElementById('loginForm').classList.remove('hidden');
 }
 
-function hideLoginForm() {
+// ซ่อนฟอร์ม Login
+function cancelLogin() {
   document.getElementById('loginForm').classList.add('hidden');
   document.getElementById('mainCard').classList.remove('hidden');
 }
 
-function confirmLogin() {
+// ส่งข้อมูล Login
+function submitLogin() {
   const name = document.getElementById('nameInput').value.trim();
   const studentID = document.getElementById('studentIDInput').value.trim();
   const email = document.getElementById('emailInput').value.trim();
@@ -154,6 +154,9 @@ function confirmLogin() {
     return;
   }
 
+  const user = { name, studentID, email };
+  localStorage.setItem(`table${tableNumber}User`, JSON.stringify(user));
+
   const data = new URLSearchParams();
   data.append('table', tableNumber);
   data.append('status', 'จองแล้ว');
@@ -166,19 +169,38 @@ function confirmLogin() {
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: data
   })
-  .then(response => response.text())
-  .then(result => {
-    localStorage.setItem(`table${tableNumber}User`, JSON.stringify({ name, studentID, email }));
-    hideLoginForm();
+  .then(() => {
+    cancelLogin();
     updateUI();
   })
-  .catch(error => alert('เกิดข้อผิดพลาด: ' + error));
+  .catch(err => alert('เกิดข้อผิดพลาด: ' + err));
 }
 
+// แสดงฟอร์ม Logout
 function confirmLogout() {
+  document.getElementById('mainCard').classList.add('hidden');
+  document.getElementById('logoutForm').classList.remove('hidden');
+}
+
+// ยกเลิก Logout
+function cancelLogout() {
+  document.getElementById('logoutForm').classList.add('hidden');
+  document.getElementById('mainCard').classList.remove('hidden');
+}
+
+// ยืนยัน Logout หลังกรอกรหัส
+function submitLogout() {
+  const inputID = document.getElementById('logoutStudentIDInput').value.trim();
   const user = JSON.parse(localStorage.getItem(`table${tableNumber}User`));
+
   if (!user) {
     alert('ไม่พบข้อมูลผู้ใช้');
+    cancelLogout();
+    return;
+  }
+
+  if (inputID !== user.studentID) {
+    alert('รหัสนักศึกษาไม่ถูกต้อง');
     return;
   }
 
@@ -196,11 +218,13 @@ function confirmLogout() {
   })
   .then(() => {
     localStorage.removeItem(`table${tableNumber}User`);
+    cancelLogout();
     updateUI();
   })
   .catch(error => alert('เกิดข้อผิดพลาด: ' + error));
 }
 
+// โหลดข้อมูลทันทีที่เข้าเว็บ
 updateUI();
 </script>
 
