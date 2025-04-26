@@ -83,7 +83,7 @@
   </div>
 </div>
 
-<!-- ฟอร์ม Logout ยืนยันรหัส -->
+<!-- ฟอร์ม Logout -->
 <div id="logoutForm" class="card hidden">
   <h2>Logout</h2>
   <div class="form-container">
@@ -99,32 +99,45 @@
 const tableNumber = 1;
 const scriptURL = 'https://script.google.com/macros/s/AKfycbz3BAoUZr7_uy2BFocspCqgMlf9lfM_fcUea4J6LWBlinNBR6KjIk2HKNI5sblC6T0/exec'; // เปลี่ยนเป็น URL ของคุณเอง
 
-// โหลดสถานะโต๊ะจาก Google Sheet
+// โหลดสถานะโต๊ะจาก localStorage และ server
 function updateUI() {
+  // 1. โหลดข้อมูลจาก localStorage มาก่อน (ข้อมูลเก่า)
+  const cached = JSON.parse(localStorage.getItem(`table${tableNumber}CachedData`));
+  if (cached) {
+    updatePage(cached.status1, cached.name1);
+  }
+
+  // 2. จากนั้น Fetch ข้อมูลสดจาก Server (ข้อมูลใหม่)
   fetch(scriptURL + '?action=getStatus')
     .then(response => response.json())
     .then(data => {
-      const { status1, name1 } = data;
-      const statusEl = document.getElementById('status');
-      const nameEl = document.getElementById('name');
-      const loginBtn = document.getElementById('loginBtn');
-      const logoutBtn = document.getElementById('logoutBtn');
-
-      if (status1 === 'จองแล้ว') {
-        statusEl.textContent = 'BOOKED';
-        statusEl.style.backgroundColor = '#e74c3c';
-        nameEl.textContent = name1 || '-';
-        loginBtn.classList.add('hidden');
-        logoutBtn.classList.remove('hidden');
-      } else {
-        statusEl.textContent = 'AVAILABLE';
-        statusEl.style.backgroundColor = '#2ecc71';
-        nameEl.textContent = '-';
-        loginBtn.classList.remove('hidden');
-        logoutBtn.classList.add('hidden');
-      }
+      updatePage(data.status1, data.name1);
+      // เก็บข้อมูลใหม่ลง localStorage
+      localStorage.setItem(`table${tableNumber}CachedData`, JSON.stringify(data));
     })
     .catch(err => console.error('Error:', err));
+}
+
+// ฟังก์ชันอัปเดตหน้าจอ
+function updatePage(status1, name1) {
+  const statusEl = document.getElementById('status');
+  const nameEl = document.getElementById('name');
+  const loginBtn = document.getElementById('loginBtn');
+  const logoutBtn = document.getElementById('logoutBtn');
+
+  if (status1 === 'จองแล้ว') {
+    statusEl.textContent = 'BOOKED';
+    statusEl.style.backgroundColor = '#e74c3c';
+    nameEl.textContent = name1 || '-';
+    loginBtn.classList.add('hidden');
+    logoutBtn.classList.remove('hidden');
+  } else {
+    statusEl.textContent = 'AVAILABLE';
+    statusEl.style.backgroundColor = '#2ecc71';
+    nameEl.textContent = '-';
+    loginBtn.classList.remove('hidden');
+    logoutBtn.classList.add('hidden');
+  }
 }
 
 // แสดงฟอร์ม Login
@@ -133,7 +146,7 @@ function showLoginForm() {
   document.getElementById('loginForm').classList.remove('hidden');
 }
 
-// ซ่อนฟอร์ม Login
+// ยกเลิก Login
 function cancelLogin() {
   document.getElementById('loginForm').classList.add('hidden');
   document.getElementById('mainCard').classList.remove('hidden');
