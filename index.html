@@ -134,7 +134,7 @@ function updateUI() {
   }
 
   // ดึงข้อมูลสดจาก Server
-  fetch(scriptURL + '?action=getStatus')
+  fetch(scriptURL + '?mode=status')
     .then(response => response.json())
     .then(data => {
       updatePage(data.status1, data.name1);
